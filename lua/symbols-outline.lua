@@ -120,6 +120,7 @@ end
 
 function M._set_folded(folded, move_cursor, node_index)
   local node = M.state.flattened_outline_items[node_index] or M._current_node()
+  if not node then return end
   local changed = (folded ~= folding.is_folded(node))
 
   if folding.is_foldable(node) and changed then
@@ -275,33 +276,6 @@ local function setup_keymaps(bufnr)
   end)
 end
 
-local function handler(response)
-  if response == nil or type(response) ~= 'table' or M.view:is_open() then
-    return
-  end
-
-  M.state.code_win = vim.api.nvim_get_current_win()
-
-  M.view:setup_view()
-  -- clear state when buffer is closed
-  vim.api.nvim_buf_attach(M.view.bufnr, false, {
-    on_detach = function(_, _)
-      wipe_state()
-    end,
-  })
-
-  setup_keymaps(M.view.bufnr)
-  setup_buffer_autocmd()
-
-  local items = parser.parse(response)
-
-  M.state.outline_items = items
-  M.state.flattened_outline_items = parser.flatten(items)
-
-  writer.parse_and_write(M.view.bufnr, M.state.flattened_outline_items)
-
-  M._highlight_current_item(M.state.code_win)
-end
 
 function M.toggle_outline()
   if M.view:is_open() then
@@ -313,7 +287,18 @@ end
 
 function M.open_outline()
   if not M.view:is_open() then
-    providers.request_symbols(handler)
+      wipe_state()
+
+      M.view:setup_view()
+
+      vim.api.nvim_buf_attach(M.view.bufnr, false, {
+          on_detach = function(_, _)
+              wipe_state()
+          end,
+      })
+
+      setup_keymaps(M.view.bufnr)
+      setup_buffer_autocmd()
   end
 end
 
