@@ -23,13 +23,13 @@ function View:setup_view()
   vim.api.nvim_win_set_buf(self.winnr, self.bufnr)
 
   -- window stuff
-  vim.api.nvim_win_set_option(self.winnr, 'number', false)
-  vim.api.nvim_win_set_option(self.winnr, 'relativenumber', false)
-  vim.api.nvim_win_set_option(self.winnr, 'winfixwidth', true)
-  vim.api.nvim_win_set_option(self.winnr, 'list', false)
-  vim.api.nvim_win_set_option(self.winnr, 'wrap', config.options.wrap)
-  vim.api.nvim_win_set_option(self.winnr, 'linebreak', true) -- only has effect when wrap=true
-  vim.api.nvim_win_set_option(self.winnr, 'breakindent', true) -- only has effect when wrap=true
+  vim.opt_local.number = false
+  vim.opt_local.relativenumber = false
+  vim.opt_local.winfixwidth = true
+  vim.opt_local.list = false
+  vim.opt_local.wrap = config.options.wrap
+  vim.opt_local.linebreak = true -- only has effect when wrap=true
+  vim.opt_local.breakindent = true -- only has effect when wrap=true
   --  Would be nice to use ui.markers.vertical as part of showbreak to keep
   --  continuity of the tree UI, but there's currently no way to style the
   --  color, apart from globally overriding hl-NonText, which will potentially
@@ -41,11 +41,11 @@ function View:setup_view()
   vim.api.nvim_buf_set_option(self.bufnr, 'modifiable', false)
 
   if config.options.show_numbers or config.options.show_relative_numbers then
-    vim.api.nvim_win_set_option(self.winnr, 'nu', true)
+    vim.opt_local.number = true
   end
 
   if config.options.show_relative_numbers then
-    vim.api.nvim_win_set_option(self.winnr, 'rnu', true)
+    vim.opt_local.relativenumber = true
   end
 end
 
